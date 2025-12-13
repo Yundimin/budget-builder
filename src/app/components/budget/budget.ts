@@ -168,7 +168,7 @@ export class Budget implements AfterViewInit {
     }));
   }
 
-  changeEnd(event: any) {
+  changeEnd(event: Event) {
     const target = event.target as HTMLInputElement;
     this.dateRange.update((range) => ({
       ...range,
