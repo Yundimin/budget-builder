@@ -1,0 +1,33 @@
+<div class="w-full min-h-screen h-full bg-amber-100 flex flex-col justify-center items-center">
+  <div
+    class="flex w-full h-full flex flex-col justify-center items-center overflow-auto p-[32px] gap-[64px]"
+  >
+    <div class="text-[32px] font-bold text-[#242424]">Budget Builder</div>
+
+    <div class="w-full h-fit flex flex-col gap-[16px]">
+      <div class="w-full h-fit flex gap-[16px]">
+        <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
+          <div class="text-[16px] font-medium text-[#242424]">Start Period</div>
+          <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeStart($event)">
+            @for (month of startMonth(); track $index) {
+            <option [value]="month.id">
+              {{ month.label }}
+            </option>
+            }
+          </select>
+        </div>
+
+        <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
+          <div class="text-[16px] font-medium text-[#242424]">End Period</div>
+          <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeEnd($event)">
+            @for (month of endMonth(); track $index) {
+            <option [value]="month.id" [selected]="month.id === '2026-12'">
+              {{ month.label }}
+            </option>
+            }
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
