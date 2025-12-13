@@ -73,6 +73,7 @@
                   class="border p-[4px] w-full text-right"
                   type="number"
                   [value]="row.values[month.id]"
+                  (input)="changeCellInput(BudgetType.Income, row.id, month.id, $event)"
                   (keydown)="handleKeydown($event, BudgetType.Income, row.id, month.id)"
                   [id]="BudgetType.Income + '-' + row.id + '-' + month.id"
                 />
@@ -120,6 +121,7 @@
                   class="border p-[4px] w-full text-right"
                   type="number"
                   [value]="row.values[month.id]"
+                  (input)="changeCellInput(BudgetType.Expense, row.id, month.id, $event)"
                   (keydown)="handleKeydown($event, BudgetType.Expense, row.id, month.id)"
                   [id]="BudgetType.Expense + '-' + row.id + '-' + month.id"
                 />
@@ -131,6 +133,63 @@
               <th (click)="addRow(BudgetType.Expense)" class="p-[8px] text-blue-600">
                 + Add expense line row
               </th>
+            </tr>
+
+            <tr class="bg-gray-200 border-b">
+              <td class="p-[8px] font-bold text-blue-700">SUMMARY</td>
+              @for (month of tableMonths(); track $index) {
+              <td></td>
+              }
+            </tr>
+            <tr class="bg-gray-100 border-t">
+              <td class="p-[8px] font-bold">Income Total</td>
+              @for (month of tableMonths(); track $index) {
+              <td class="p-[8px] text-right">
+                {{ totalIncomeByMonth()[month.id] }}
+              </td>
+              }
+            </tr>
+            <tr class="bg-gray-100 border-t">
+              <td class="p-[8px] font-bold">Income Expenses</td>
+              @for (month of tableMonths(); track $index) {
+              <td class="p-[8px] text-right">
+                {{ totalExpenseByMonth()[month.id] }}
+              </td>
+              }
+            </tr>
+            <tr class="bg-gray-100 border-t">
+              <td class="p-[8px] font-bold">Profit / Loss</td>
+              @for (month of tableMonths(); track $index) {
+              <td
+                class="p-[8px] text-right"
+                [class.text-red-500]="profitLossByMonth()[month.id] < 0"
+              >
+                {{ profitLossByMonth()[month.id] }}
+              </td>
+              }
+            </tr>
+            <tr class="bg-gray-50">
+              <td class="p-[8px] font-bold text-blue-600">Opening Balance</td>
+              @for (month of tableMonths(); track $index) {
+              <td
+                class="p-2 text-right"
+                [class.text-red-600]="balancesByMonth().opening[month.id] < 0"
+              >
+                {{ balancesByMonth().opening[month.id] }}
+              </td>
+              }
+            </tr>
+
+            <tr class="bg-gray-50 border-b">
+              <td class="p-[8px] font-bold text-blue-600">Closing Balance</td>
+              @for (month of tableMonths(); track $index) {
+              <td
+                class="p-2 text-right"
+                [class.text-red-600]="balancesByMonth().closing[month.id] < 0"
+              >
+                {{ balancesByMonth().closing[month.id] }}
+              </td>
+              }
             </tr>
           </tbody>
         </table>

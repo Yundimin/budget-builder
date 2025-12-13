@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, computed, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, effect, signal } from '@angular/core';
 import { DateRange, Month, RowItem } from '../../interfaces/budget.inferface';
 import { BudgetType, KeyBoardType } from '../../enums/budget.enum';
 
@@ -70,7 +70,64 @@ export class Budget implements AfterViewInit {
     this.setNewRow('Salaries'),
     this.setNewRow('Cloud Hosting'),
   ]);
+  public totalIncomeByMonth = computed(() => {
+    const months = this.tableMonths();
+    const rows = this.incomeRows();
+    const result: Record<string, number> = {};
+
+    for (const month of months) {
+      result[month.id] = rows.reduce((sum, row) => sum + (row.values[month.id] ?? 0), 0);
+    }
+    return result;
+  });
+  public totalExpenseByMonth = computed(() => {
+    const months = this.tableMonths();
+    const rows = this.expenseRows();
+    const result: Record<string, number> = {};
+
+    for (const month of months) {
+      result[month.id] = rows.reduce((sum, row) => sum + (row.values[month.id] ?? 0), 0);
+    }
+    return result;
+  });
+  public profitLossByMonth = computed(() => {
+    const months = this.tableMonths();
+    const income = this.totalIncomeByMonth();
+    const expense = this.totalExpenseByMonth();
+
+    const result: Record<string, number> = {};
+
+    for (const month of months) {
+      result[month.id] = (income[month.id] ?? 0) - (expense[month.id] ?? 0);
+    }
+    return result;
+  });
+  public balancesByMonth = computed(() => {
+    const months = this.tableMonths();
+    const profit = this.profitLossByMonth();
+    const opening: Record<string, number> = {};
+    const closing: Record<string, number> = {};
+
+    let current = 0;
+
+    for (const month of months) {
+      opening[month.id] = current;
+      current = current + (profit[month.id] ?? 0);
+      closing[month.id] = current;
+    }
+
+    return { opening, closing };
+  });
   protected readonly BudgetType = BudgetType;
+
+  constructor() {
+    effect(() => {
+      const months = this.tableMonths();
+      if (months.length) {
+        this.resetAllValues(months);
+      }
+    });
+  }
 
   ngAfterViewInit() {
     setTimeout(() => {
@@ -164,10 +221,10 @@ export class Budget implements AfterViewInit {
 
     const rowIndex = rows.findIndex((row) => row.id === rowId);
     const colIndex = months.findIndex((month) => month.id === monthId);
-    event.preventDefault();
 
     switch (key) {
       case KeyBoardType.Enter:
+        event.preventDefault();
         const isLastRow = rowIndex === rows.length - 1;
         const isLastCol = colIndex === months.length - 1;
 
@@ -196,6 +253,7 @@ export class Budget implements AfterViewInit {
         break;
 
       case KeyBoardType.Tab:
+        event.preventDefault();
         if (colIndex < months.length - 1) {
           this.focusCell(section, rows[rowIndex].id, months[colIndex + 1].id);
         }
@@ -203,6 +261,7 @@ export class Budget implements AfterViewInit {
         break;
 
       case KeyBoardType.ArrowLeft:
+        event.preventDefault();
         if (colIndex > 0) {
           event.preventDefault();
           this.focusCell(section, rows[rowIndex].id, months[colIndex - 1].id);
@@ -211,6 +270,7 @@ export class Budget implements AfterViewInit {
         break;
 
       case KeyBoardType.ArrowRight:
+        event.preventDefault();
         if (colIndex < months.length - 1) {
           event.preventDefault();
           this.focusCell(section, rows[rowIndex].id, months[colIndex + 1].id);
@@ -219,6 +279,7 @@ export class Budget implements AfterViewInit {
         break;
 
       case KeyBoardType.ArrowUp:
+        event.preventDefault();
         if (rowIndex > 0) {
           event.preventDefault();
           this.focusCell(section, rows[rowIndex - 1].id, months[colIndex].id);
@@ -226,10 +287,15 @@ export class Budget implements AfterViewInit {
         return;
 
       case KeyBoardType.ArrowDown:
+        event.preventDefault();
         if (rowIndex < rows.length - 1) {
           event.preventDefault();
           this.focusCell(section, rows[rowIndex + 1].id, months[colIndex].id);
         }
+        return;
+        break;
+
+      default:
         return;
         break;
     }
@@ -239,5 +305,38 @@ export class Budget implements AfterViewInit {
     const id = `${section}-${rowId}-${monthId}`;
     const el = document.getElementById(id) as HTMLInputElement | null;
     el?.focus();
+  }
+
+  changeCellInput(type: BudgetType, rowId: string, monthId: string, event: Event) {
+    const target = event.target as HTMLInputElement;
+    const value = Number(target.value);
+    console.log(value);
+    const update = (rows: RowItem[]) =>
+      rows.map((r) =>
+        r.id === rowId
+          ? {
+              ...r,
+              values: { ...r.values, [monthId]: value },
+            }
+          : r
+      );
+
+    if (type === BudgetType.Income) {
+      this.incomeRows.update(update);
+    } else {
+      this.expenseRows.update(update);
+    }
+  }
+
+  resetAllValues(months: Month[]) {
+    const reset = (rows: RowItem[]) =>
+      rows.map((row) => {
+        const values: Record<string, number> = {};
+        months.forEach((month) => (values[month.id] = 0));
+        return { ...row, values };
+      });
+
+    this.incomeRows.update(reset);
+    this.expenseRows.update(reset);
   }
 }
