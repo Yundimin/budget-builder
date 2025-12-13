@@ -35,7 +35,7 @@ By default, the production build optimizes your application for performance and 
 Each month is represented as a plain object with a stable string-based id.
 
 ```ts
-interface Month {
+export interface Month {
   id: string; //  "2026-01"
   label: string; //  "Jan 2026"
   year: number;
@@ -73,16 +73,25 @@ Signals and computed Signals are located in 'app/components/budget/budget.ts'
 ### Signals
 
 dateRange // startYear, startMonth, endYear, endMonth
+
 incomeRows // list of income line items
+
 expenseRows // list of expense line items
+
 contextMenu // state for right-click context menu
 
 ### Computed
 
 startMonth // full list of selectable start months
+
 endMonth // end-month options filtered by selected start month
+
 tableMonths // months currently rendered in the table
+
 totalIncomeByMonth // Sum of all Income line item values for that month.
+
 totalExpenseByMonth // Sum of all Expenses line item values for that month.
+
 profitLossByMonth // Income Total – Total Expenses by month
+
 balancesByMonth // Closing Balance = Opening Balance + Profit/Loss ▪ The next month’s Opening Balance is the previous month’s Closing Balance
