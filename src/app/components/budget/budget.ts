@@ -1,5 +1,6 @@
 import { Component, computed, signal } from '@angular/core';
 import { DateRange, Month, RowItem } from '../../interfaces/budget.inferface';
+import { BudgetType } from '../../enums/budget.enum';
 
 @Component({
   selector: 'app-budget',
@@ -69,6 +70,7 @@ export class Budget {
     this.setNewRow('Salaries'),
     this.setNewRow('Cloud Hosting'),
   ]);
+  protected readonly BudgetType = BudgetType;
 
   changeMonthToWord(month: number): string {
     return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][
@@ -106,11 +108,11 @@ export class Budget {
     };
   }
 
-  changeLabelName(type: 'income' | 'expense', rowId: string, event: Event) {
+  changeLabelName(type: BudgetType, rowId: string, event: Event) {
     const target = event.target as HTMLInputElement;
     const value = target.value;
 
-    if (type === 'income') {
+    if (type === BudgetType.Income) {
       this.incomeRows.update((rows) =>
         rows.map((row) => (row.id === rowId ? { ...row, label: value } : row))
       );
@@ -121,16 +123,16 @@ export class Budget {
     }
   }
 
-  deleteRow(section: 'income' | 'expense', rowId: string) {
-    if (section === 'income') {
+  deleteRow(type: BudgetType, rowId: string) {
+    if (type === BudgetType.Income) {
       this.incomeRows.update((rows) => rows.filter((row) => row.id !== rowId));
     } else {
       this.expenseRows.update((rows) => rows.filter((row) => row.id !== rowId));
     }
   }
 
-  addRow(section: 'income' | 'expense') {
-    if (section === 'income') {
+  addRow(type: BudgetType) {
+    if (type === BudgetType.Income) {
       this.incomeRows.update((rows) => [...rows, this.setNewRow('New Income')]);
     } else {
       this.expenseRows.update((rows) => [...rows, this.setNewRow('New Expense')]);

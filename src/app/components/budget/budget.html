@@ -55,12 +55,12 @@
                     class="border p-[8px] w-full"
                     type="text"
                     [value]="row.label"
-                    (input)="changeLabelName('income', row.id, $event)"
+                    (input)="changeLabelName(BudgetType.Income, row.id, $event)"
                   />
                   <button
                     type="button"
                     class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
-                    (click)="deleteRow('income', row.id)"
+                    (click)="deleteRow(BudgetType.Income, row.id)"
                   >
                     ✕
                   </button>
@@ -80,7 +80,7 @@
             }
 
             <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
-              <th (click)="addRow('income')" class="p-[8px] text-blue-600">+ Add income line row</th>
+              <th (click)="addRow(BudgetType.Income)" class="p-[8px] text-blue-600">+ Add income line row</th>
             </tr>
 
             <tr class="bg-gray-200 border-b">
@@ -98,12 +98,12 @@
                     class="border p-[8px] w-full"
                     type="text"
                     [value]="row.label"
-                    (input)="changeLabelName('expense', row.id, $event)"
+                    (input)="changeLabelName(BudgetType.Expense, row.id, $event)"
                   />
                   <button
                     type="button"
                     class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
-                    (click)="deleteRow('expense', row.id)"
+                    (click)="deleteRow(BudgetType.Expense, row.id)"
                   >
                     ✕
                   </button>
@@ -122,7 +122,7 @@
             </tr>
             }
             <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
-              <th (click)="addRow('expense')" class="p-[8px] text-blue-600">+ Add expense line row</th>
+              <th (click)="addRow(BudgetType.Expense)" class="p-[8px] text-blue-600">+ Add expense line row</th>
             </tr>
           </tbody>
         </table>
