@@ -11,3 +11,9 @@ export interface DateRange {
   endYear: number;
   endMonth: number;
 }
+
+export interface RowItem {
+  id: string;
+  label: string;
+  values: Record<string, number>;
+}

@@ -32,7 +32,7 @@
         <table class="w-fit h-fit text-[14px] text-[#242424]">
           <thead>
             <tr class="bg-gray-50 border-b">
-              <th class="p-2 text-left w-fit min-w-[100px]">Label</th>
+              <th class="p-[8px] text-left w-fit min-w-[180px]">Label</th>
               @for (month of tableMonths(); track $index) {
               <th class="p-[8px] text-center min-w-[100px]">
                 {{ month.label }}
@@ -47,12 +47,82 @@
               <td></td>
               }
             </tr>
+            @for (row of incomeRows(); track $index) {
+            <tr class="border-b">
+              <td class="p-[8px]">
+                <div class="flex items-center gap-[8px]">
+                  <input
+                    class="border p-[8px] w-full"
+                    type="text"
+                    [value]="row.label"
+                    (input)="changeLabelName('income', row.id, $event)"
+                  />
+                  <button
+                    type="button"
+                    class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
+                    (click)="deleteRow('income', row.id)"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </td>
+
+              @for (month of tableMonths(); track $index) {
+              <td class="p-[4px]">
+                <input
+                  class="border p-[4px] w-full text-right"
+                  type="number"
+                  [value]="row.values[month.id]"
+                />
+              </td>
+              }
+            </tr>
+            }
+
+            <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
+              <th (click)="addRow('income')" class="p-[8px] text-blue-600">+ Add income line row</th>
+            </tr>
 
             <tr class="bg-gray-200 border-b">
               <td class="p-[8px] font-bold text-red-500">EXPENSES</td>
               @for (month of tableMonths(); track $index) {
               <td></td>
               }
+            </tr>
+
+            @for (row of expenseRows(); track $index) {
+            <tr class="border-b">
+              <td class="p-[8px]">
+                <div class="flex items-center gap-[8px]">
+                  <input
+                    class="border p-[8px] w-full"
+                    type="text"
+                    [value]="row.label"
+                    (input)="changeLabelName('expense', row.id, $event)"
+                  />
+                  <button
+                    type="button"
+                    class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
+                    (click)="deleteRow('expense', row.id)"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </td>
+
+              @for (month of tableMonths(); track $index) {
+              <td class="p-[4px]">
+                <input
+                  class="border p-[4px] w-full text-right"
+                  type="number"
+                  [value]="row.values[month.id]"
+                />
+              </td>
+              }
+            </tr>
+            }
+            <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
+              <th (click)="addRow('expense')" class="p-[8px] text-blue-600">+ Add expense line row</th>
             </tr>
           </tbody>
         </table>

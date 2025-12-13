@@ -1,5 +1,5 @@
 import { Component, computed, signal } from '@angular/core';
-import { DateRange, Month } from '../../interfaces/budget.inferface';
+import { DateRange, Month, RowItem } from '../../interfaces/budget.inferface';
 
 @Component({
   selector: 'app-budget',
@@ -9,6 +9,7 @@ import { DateRange, Month } from '../../interfaces/budget.inferface';
   standalone: true,
 })
 export class Budget {
+  public defaultNumber: number = 0;
   public dateRange = signal<DateRange>({
     startYear: 2026,
     startMonth: 1,
@@ -63,6 +64,11 @@ export class Budget {
 
     return list;
   });
+  public incomeRows = signal<RowItem[]>([this.setNewRow('Sales'), this.setNewRow('Consulting')]);
+  public expenseRows = signal<RowItem[]>([
+    this.setNewRow('Salaries'),
+    this.setNewRow('Cloud Hosting'),
+  ]);
 
   changeMonthToWord(month: number): string {
     return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][
@@ -87,5 +93,47 @@ export class Budget {
       endYear: +target.value.split('-')[0],
       endMonth: +target.value.split('-')[1],
     }));
+  }
+
+  setNewRow(label: string): RowItem {
+    const values: Record<string, number> = {};
+    this.tableMonths().forEach((month) => (values[month.id] = 0));
+
+    return {
+      id: `row-${Date.now()}-${++this.defaultNumber}`,
+      label,
+      values,
+    };
+  }
+
+  changeLabelName(type: 'income' | 'expense', rowId: string, event: Event) {
+    const target = event.target as HTMLInputElement;
+    const value = target.value;
+
+    if (type === 'income') {
+      this.incomeRows.update((rows) =>
+        rows.map((row) => (row.id === rowId ? { ...row, label: value } : row))
+      );
+    } else {
+      this.expenseRows.update((rows) =>
+        rows.map((row) => (row.id === rowId ? { ...row, label: value } : row))
+      );
+    }
+  }
+
+  deleteRow(section: 'income' | 'expense', rowId: string) {
+    if (section === 'income') {
+      this.incomeRows.update((rows) => rows.filter((row) => row.id !== rowId));
+    } else {
+      this.expenseRows.update((rows) => rows.filter((row) => row.id !== rowId));
+    }
+  }
+
+  addRow(section: 'income' | 'expense') {
+    if (section === 'income') {
+      this.incomeRows.update((rows) => [...rows, this.setNewRow('New Income')]);
+    } else {
+      this.expenseRows.update((rows) => [...rows, this.setNewRow('New Expense')]);
+    }
   }
 }
