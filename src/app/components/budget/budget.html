@@ -1,7 +1,7 @@
-<div class="w-full min-h-screen h-full bg-amber-100 flex flex-col justify-center items-center">
-  <div
-    class="flex w-full h-full flex flex-col justify-center items-center overflow-auto p-[32px] gap-[64px]"
-  >
+<div
+  class="w-full min-w-screen min-h-screen h-full bg-amber-100 flex flex-col justify-center items-center overflow-auto"
+>
+  <div class="flex w-full h-full flex flex-col justify-center items-start p-[32px] gap-[64px]">
     <div class="text-[32px] font-bold text-[#242424]">Budget Builder</div>
 
     <div class="w-full h-fit flex flex-col gap-[16px]">
@@ -16,7 +16,6 @@
             }
           </select>
         </div>
-
         <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
           <div class="text-[16px] font-medium text-[#242424]">End Period</div>
           <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeEnd($event)">
@@ -27,6 +26,36 @@
             }
           </select>
         </div>
+      </div>
+
+      <div class="w-fit h-fit border rounded-[6px] overflow-auto">
+        <table class="w-fit h-fit text-[14px] text-[#242424]">
+          <thead>
+            <tr class="bg-gray-50 border-b">
+              <th class="p-2 text-left w-fit min-w-[100px]">Label</th>
+              @for (month of tableMonths(); track $index) {
+              <th class="p-[8px] text-center min-w-[100px]">
+                {{ month.label }}
+              </th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-gray-200 border-b">
+              <td class="p-[8px] font-bold text-green-700">INCOME</td>
+              @for (month of tableMonths(); track $index) {
+              <td></td>
+              }
+            </tr>
+
+            <tr class="bg-gray-200 border-b">
+              <td class="p-[8px] font-bold text-red-500">EXPENSES</td>
+              @for (month of tableMonths(); track $index) {
+              <td></td>
+              }
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>

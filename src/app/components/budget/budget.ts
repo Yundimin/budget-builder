@@ -38,6 +38,31 @@ export class Budget {
       return m.year > startYear || (m.year === startYear && m.month >= startMonth);
     });
   });
+  public tableMonths = computed<Month[]>(() => {
+    const { startYear, startMonth, endYear, endMonth } = this.dateRange();
+    const list: Month[] = [];
+
+    let year = startYear;
+    let month = startMonth;
+
+    while (year < endYear || (year === endYear && month <= endMonth)) {
+      const monthPad = month.toString().padStart(2, '0');
+      list.push({
+        id: `${year}-${monthPad}`,
+        label: `${this.changeMonthToWord(month)} ${year}`,
+        year: year,
+        month: month,
+      });
+
+      month++;
+      if (month > 12) {
+        month = 1;
+        year++;
+      }
+    }
+
+    return list;
+  });
 
   changeMonthToWord(month: number): string {
     return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][
