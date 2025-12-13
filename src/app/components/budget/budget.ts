@@ -118,6 +118,12 @@ export class Budget implements AfterViewInit {
 
     return { opening, closing };
   });
+  public contextMenu = signal<{
+    visible: boolean;
+    x: number;
+    y: number;
+    target: { type: BudgetType; rowId: string; monthId: string } | null;
+  }>({ visible: false, x: 0, y: 0, target: null });
   protected readonly BudgetType = BudgetType;
 
   constructor() {
@@ -310,7 +316,6 @@ export class Budget implements AfterViewInit {
   changeCellInput(type: BudgetType, rowId: string, monthId: string, event: Event) {
     const target = event.target as HTMLInputElement;
     const value = Number(target.value);
-    console.log(value);
     const update = (rows: RowItem[]) =>
       rows.map((r) =>
         r.id === rowId
@@ -338,5 +343,48 @@ export class Budget implements AfterViewInit {
 
     this.incomeRows.update(reset);
     this.expenseRows.update(reset);
+  }
+
+  onContextMenu(event: MouseEvent, type: BudgetType, rowId: string, monthId: string) {
+    event.preventDefault();
+
+    this.contextMenu.set({
+      visible: true,
+      x: event.clientX,
+      y: event.clientY,
+      target: { type, rowId, monthId },
+    });
+  }
+
+  closeContextMenu() {
+    this.contextMenu.update((rest) => ({ ...rest, visible: false }));
+  }
+
+  applyToAll() {
+    const target = this.contextMenu().target;
+    if (!target) return;
+
+    const { type, rowId, monthId } = target;
+
+    const list = type === BudgetType.Income ? this.incomeRows() : this.expenseRows();
+    const row = list.find((r) => r.id === rowId);
+    if (!row) return;
+
+    const base = row.values[monthId];
+
+    const newValues: Record<string, number> = {};
+    for (const key in row.values) {
+      newValues[key] = base;
+    }
+
+    const updatedRows = list.map((row) => (row.id === rowId ? { ...row, values: newValues } : row));
+
+    if (type === BudgetType.Income) {
+      this.incomeRows.set(updatedRows);
+    } else {
+      this.expenseRows.set(updatedRows);
+    }
+
+    this.contextMenu.update((rest) => ({ ...rest, visible: false }));
   }
 }

@@ -1,199 +1,218 @@
 <div
   class="w-full min-w-screen min-h-screen h-full bg-amber-100 flex flex-col justify-center items-center overflow-auto"
 >
-  <div class="flex w-full h-full flex flex-col justify-center items-start p-[32px] gap-[64px]">
-    <div class="text-[32px] font-bold text-[#242424]">Budget Builder</div>
+  <div (click)="closeContextMenu()" class="w-full h-full flex-col">
+    <div class="flex w-full h-full flex-col justify-center items-start p-[32px] gap-[64px]">
+      <div class="text-[32px] font-bold text-[#242424]">Budget Builder</div>
 
-    <div class="w-full h-fit flex flex-col gap-[16px]">
-      <div class="w-full h-fit flex gap-[16px]">
-        <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
-          <div class="text-[16px] font-medium text-[#242424]">Start Period</div>
-          <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeStart($event)">
-            @for (month of startMonth(); track $index) {
-            <option [value]="month.id">
-              {{ month.label }}
-            </option>
-            }
-          </select>
-        </div>
-        <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
-          <div class="text-[16px] font-medium text-[#242424]">End Period</div>
-          <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeEnd($event)">
-            @for (month of endMonth(); track $index) {
-            <option [value]="month.id" [selected]="month.id === '2026-12'">
-              {{ month.label }}
-            </option>
-            }
-          </select>
-        </div>
-      </div>
-
-      <div class="w-fit h-fit border rounded-[6px] overflow-auto">
-        <table class="w-fit h-fit text-[14px] text-[#242424]">
-          <thead>
-            <tr class="bg-gray-50 border-b">
-              <th class="p-[8px] text-left w-fit min-w-[180px]">Label</th>
-              @for (month of tableMonths(); track $index) {
-              <th class="p-[8px] text-center min-w-[100px]">
+      <div class="w-full h-fit flex flex-col gap-[16px]">
+        <div class="w-full h-fit flex gap-[16px]">
+          <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
+            <div class="text-[16px] font-medium text-[#242424]">Start Period</div>
+            <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeStart($event)">
+              @for (month of startMonth(); track $index) {
+              <option [value]="month.id">
                 {{ month.label }}
-              </th>
+              </option>
               }
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="bg-gray-200 border-b">
-              <td class="p-[8px] font-bold text-green-700">INCOME</td>
-              @for (month of tableMonths(); track $index) {
-              <td></td>
+            </select>
+          </div>
+          <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
+            <div class="text-[16px] font-medium text-[#242424]">End Period</div>
+            <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeEnd($event)">
+              @for (month of endMonth(); track $index) {
+              <option [value]="month.id" [selected]="month.id === '2026-12'">
+                {{ month.label }}
+              </option>
               }
-            </tr>
-            @for (row of incomeRows(); track $index) {
-            <tr class="border-b">
-              <td class="p-[8px]">
-                <div class="flex items-center gap-[8px]">
+            </select>
+          </div>
+        </div>
+
+        <div class="w-fit h-fit border rounded-[6px] overflow-auto">
+          <table class="w-fit h-fit text-[14px] text-[#242424]">
+            <thead>
+              <tr class="bg-gray-50 border-b">
+                <th class="p-[8px] text-left w-fit min-w-[180px]">Label</th>
+                @for (month of tableMonths(); track $index) {
+                <th class="p-[8px] text-center min-w-[100px]">
+                  {{ month.label }}
+                </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="bg-gray-200 border-b">
+                <td class="p-[8px] font-bold text-green-700">INCOME</td>
+                @for (month of tableMonths(); track $index) {
+                <td></td>
+                }
+              </tr>
+              @for (row of incomeRows(); track $index) {
+              <tr class="border-b">
+                <td class="p-[8px]">
+                  <div class="flex items-center gap-[8px]">
+                    <input
+                      class="border p-[8px] w-full"
+                      type="text"
+                      [value]="row.label"
+                      (input)="changeLabelName(BudgetType.Income, row.id, $event)"
+                    />
+                    <button
+                      type="button"
+                      class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
+                      (click)="deleteRow(BudgetType.Income, row.id)"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </td>
+
+                @for (month of tableMonths(); track $index) {
+                <td class="p-[4px]">
                   <input
-                    class="border p-[8px] w-full"
-                    type="text"
-                    [value]="row.label"
-                    (input)="changeLabelName(BudgetType.Income, row.id, $event)"
+                    class="border p-[4px] w-full text-right"
+                    type="number"
+                    [value]="row.values[month.id]"
+                    (input)="changeCellInput(BudgetType.Income, row.id, month.id, $event)"
+                    (keydown)="handleKeydown($event, BudgetType.Income, row.id, month.id)"
+                    (contextmenu)="onContextMenu($event, BudgetType.Income, row.id, month.id)"
+                    [id]="BudgetType.Income + '-' + row.id + '-' + month.id"
                   />
-                  <button
-                    type="button"
-                    class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
-                    (click)="deleteRow(BudgetType.Income, row.id)"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </td>
-
-              @for (month of tableMonths(); track $index) {
-              <td class="p-[4px]">
-                <input
-                  class="border p-[4px] w-full text-right"
-                  type="number"
-                  [value]="row.values[month.id]"
-                  (input)="changeCellInput(BudgetType.Income, row.id, month.id, $event)"
-                  (keydown)="handleKeydown($event, BudgetType.Income, row.id, month.id)"
-                  [id]="BudgetType.Income + '-' + row.id + '-' + month.id"
-                />
-              </td>
+                </td>
+                }
+              </tr>
               }
-            </tr>
-            }
 
-            <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
-              <th (click)="addRow(BudgetType.Income)" class="p-[8px] text-blue-600">
-                + Add income line row
-              </th>
-            </tr>
+              <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
+                <th (click)="addRow(BudgetType.Income)" class="p-[8px] text-blue-600">
+                  + Add income line row
+                </th>
+              </tr>
 
-            <tr class="bg-gray-200 border-b">
-              <td class="p-[8px] font-bold text-red-500">EXPENSES</td>
-              @for (month of tableMonths(); track $index) {
-              <td></td>
-              }
-            </tr>
+              <tr class="bg-gray-200 border-b">
+                <td class="p-[8px] font-bold text-red-500">EXPENSES</td>
+                @for (month of tableMonths(); track $index) {
+                <td></td>
+                }
+              </tr>
 
-            @for (row of expenseRows(); track $index) {
-            <tr class="border-b">
-              <td class="p-[8px]">
-                <div class="flex items-center gap-[8px]">
+              @for (row of expenseRows(); track $index) {
+              <tr class="border-b">
+                <td class="p-[8px]">
+                  <div class="flex items-center gap-[8px]">
+                    <input
+                      class="border p-[8px] w-full"
+                      type="text"
+                      [value]="row.label"
+                      (input)="changeLabelName(BudgetType.Expense, row.id, $event)"
+                    />
+                    <button
+                      type="button"
+                      class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
+                      (click)="deleteRow(BudgetType.Expense, row.id)"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                </td>
+
+                @for (month of tableMonths(); track $index) {
+                <td class="p-[4px]">
                   <input
-                    class="border p-[8px] w-full"
-                    type="text"
-                    [value]="row.label"
-                    (input)="changeLabelName(BudgetType.Expense, row.id, $event)"
+                    class="border p-[4px] w-full text-right"
+                    type="number"
+                    [value]="row.values[month.id]"
+                    (input)="changeCellInput(BudgetType.Expense, row.id, month.id, $event)"
+                    (keydown)="handleKeydown($event, BudgetType.Expense, row.id, month.id)"
+                    [id]="BudgetType.Expense + '-' + row.id + '-' + month.id"
+                    (contextmenu)="onContextMenu($event, BudgetType.Expense, row.id, month.id)"
                   />
-                  <button
-                    type="button"
-                    class="w-[30px] h-[30px] flex justify-center items-center text-[14px] p-[8px] text-red-500 cursor-pointer rounded-[8px] hover:bg-gray-50 active:bg-gray-100"
-                    (click)="deleteRow(BudgetType.Expense, row.id)"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </td>
+                </td>
+                }
+              </tr>
+              }
+              <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
+                <th (click)="addRow(BudgetType.Expense)" class="p-[8px] text-blue-600">
+                  + Add expense line row
+                </th>
+              </tr>
 
-              @for (month of tableMonths(); track $index) {
-              <td class="p-[4px]">
-                <input
-                  class="border p-[4px] w-full text-right"
-                  type="number"
-                  [value]="row.values[month.id]"
-                  (input)="changeCellInput(BudgetType.Expense, row.id, month.id, $event)"
-                  (keydown)="handleKeydown($event, BudgetType.Expense, row.id, month.id)"
-                  [id]="BudgetType.Expense + '-' + row.id + '-' + month.id"
-                />
-              </td>
-              }
-            </tr>
-            }
-            <tr class="hover:bg-gray-50 active:bg-gray-100 cursor-pointer border-b">
-              <th (click)="addRow(BudgetType.Expense)" class="p-[8px] text-blue-600">
-                + Add expense line row
-              </th>
-            </tr>
+              <tr class="bg-gray-200 border-b">
+                <td class="p-[8px] font-bold text-blue-700">SUMMARY</td>
+                @for (month of tableMonths(); track $index) {
+                <td></td>
+                }
+              </tr>
+              <tr class="bg-gray-100 border-t">
+                <td class="p-[8px] font-bold">Income Total</td>
+                @for (month of tableMonths(); track $index) {
+                <td class="p-[8px] text-right">
+                  {{ totalIncomeByMonth()[month.id] }}
+                </td>
+                }
+              </tr>
+              <tr class="bg-gray-100 border-t">
+                <td class="p-[8px] font-bold">Income Expenses</td>
+                @for (month of tableMonths(); track $index) {
+                <td class="p-[8px] text-right">
+                  {{ totalExpenseByMonth()[month.id] }}
+                </td>
+                }
+              </tr>
+              <tr class="bg-gray-100 border-t">
+                <td class="p-[8px] font-bold">Profit / Loss</td>
+                @for (month of tableMonths(); track $index) {
+                <td
+                  class="p-[8px] text-right"
+                  [class.text-red-500]="profitLossByMonth()[month.id] < 0"
+                >
+                  {{ profitLossByMonth()[month.id] }}
+                </td>
+                }
+              </tr>
+              <tr class="bg-gray-50 border-t">
+                <td class="p-[8px] font-bold text-blue-600">Opening Balance</td>
+                @for (month of tableMonths(); track $index) {
+                <td
+                  class="p-[8px] text-right"
+                  [class.text-red-600]="balancesByMonth().opening[month.id] < 0"
+                >
+                  {{ balancesByMonth().opening[month.id] }}
+                </td>
+                }
+              </tr>
 
-            <tr class="bg-gray-200 border-b">
-              <td class="p-[8px] font-bold text-blue-700">SUMMARY</td>
-              @for (month of tableMonths(); track $index) {
-              <td></td>
-              }
-            </tr>
-            <tr class="bg-gray-100 border-t">
-              <td class="p-[8px] font-bold">Income Total</td>
-              @for (month of tableMonths(); track $index) {
-              <td class="p-[8px] text-right">
-                {{ totalIncomeByMonth()[month.id] }}
-              </td>
-              }
-            </tr>
-            <tr class="bg-gray-100 border-t">
-              <td class="p-[8px] font-bold">Income Expenses</td>
-              @for (month of tableMonths(); track $index) {
-              <td class="p-[8px] text-right">
-                {{ totalExpenseByMonth()[month.id] }}
-              </td>
-              }
-            </tr>
-            <tr class="bg-gray-100 border-t">
-              <td class="p-[8px] font-bold">Profit / Loss</td>
-              @for (month of tableMonths(); track $index) {
-              <td
-                class="p-[8px] text-right"
-                [class.text-red-500]="profitLossByMonth()[month.id] < 0"
-              >
-                {{ profitLossByMonth()[month.id] }}
-              </td>
-              }
-            </tr>
-            <tr class="bg-gray-50">
-              <td class="p-[8px] font-bold text-blue-600">Opening Balance</td>
-              @for (month of tableMonths(); track $index) {
-              <td
-                class="p-2 text-right"
-                [class.text-red-600]="balancesByMonth().opening[month.id] < 0"
-              >
-                {{ balancesByMonth().opening[month.id] }}
-              </td>
-              }
-            </tr>
-
-            <tr class="bg-gray-50 border-b">
-              <td class="p-[8px] font-bold text-blue-600">Closing Balance</td>
-              @for (month of tableMonths(); track $index) {
-              <td
-                class="p-2 text-right"
-                [class.text-red-600]="balancesByMonth().closing[month.id] < 0"
-              >
-                {{ balancesByMonth().closing[month.id] }}
-              </td>
-              }
-            </tr>
-          </tbody>
-        </table>
+              <tr class="bg-gray-50 border-t border-b">
+                <td class="p-[8px] font-bold text-blue-600">Closing Balance</td>
+                @for (month of tableMonths(); track $index) {
+                <td
+                  class="p-[8px] text-right"
+                  [class.text-red-600]="balancesByMonth().closing[month.id] < 0"
+                >
+                  {{ balancesByMonth().closing[month.id] }}
+                </td>
+                }
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   </div>
+
+  @if (contextMenu().visible) {
+  <div
+    class="absolute bg-white border text-[14px] z-10 rounded-[8px] overflow-auto"
+    [style.left.px]="contextMenu().x"
+    [style.top.px]="contextMenu().y"
+  >
+    <div
+      class="w-full px-[16px] py-[8px] hover:bg-gray-50 active:bg-gray-100 cursor-pointer"
+      (click)="applyToAll()"
+    >
+      Apply to all
+    </div>
+  </div>
+  }
 </div>
