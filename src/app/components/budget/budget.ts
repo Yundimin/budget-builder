@@ -1,6 +1,6 @@
-import { Component, computed, signal } from '@angular/core';
+import { AfterViewInit, Component, computed, signal } from '@angular/core';
 import { DateRange, Month, RowItem } from '../../interfaces/budget.inferface';
-import { BudgetType } from '../../enums/budget.enum';
+import { BudgetType, KeyBoardType } from '../../enums/budget.enum';
 
 @Component({
   selector: 'app-budget',
@@ -9,7 +9,7 @@ import { BudgetType } from '../../enums/budget.enum';
   styleUrl: './budget.css',
   standalone: true,
 })
-export class Budget {
+export class Budget implements AfterViewInit {
   public defaultNumber: number = 0;
   public dateRange = signal<DateRange>({
     startYear: 2026,
@@ -71,6 +71,23 @@ export class Budget {
     this.setNewRow('Cloud Hosting'),
   ]);
   protected readonly BudgetType = BudgetType;
+
+  ngAfterViewInit() {
+    setTimeout(() => {
+      const rows = this.incomeRows();
+      const months = this.tableMonths();
+
+      if (!rows.length || !months.length) return;
+
+      const firstRow = rows[0];
+      const firstMonth = months[0];
+
+      const id = `${BudgetType.Income}-${firstRow.id}-${firstMonth.id}`;
+      const el = document.getElementById(id) as HTMLInputElement | null;
+
+      el?.focus();
+    }, 0);
+  }
 
   changeMonthToWord(month: number): string {
     return ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'][
@@ -137,5 +154,90 @@ export class Budget {
     } else {
       this.expenseRows.update((rows) => [...rows, this.setNewRow('New Expense')]);
     }
+  }
+
+  handleKeydown(event: KeyboardEvent, section: BudgetType, rowId: string, monthId: string) {
+    const key = event.key;
+
+    const months = this.tableMonths();
+    const rows = section === BudgetType.Income ? this.incomeRows() : this.expenseRows();
+
+    const rowIndex = rows.findIndex((row) => row.id === rowId);
+    const colIndex = months.findIndex((month) => month.id === monthId);
+    event.preventDefault();
+
+    switch (key) {
+      case KeyBoardType.Enter:
+        const isLastRow = rowIndex === rows.length - 1;
+        const isLastCol = colIndex === months.length - 1;
+
+        if (isLastRow && isLastCol) {
+          if (section === BudgetType.Income) {
+            this.addRow(BudgetType.Income);
+          } else {
+            this.addRow(BudgetType.Expense);
+          }
+
+          setTimeout(() => {
+            const newRows = section === BudgetType.Income ? this.incomeRows() : this.expenseRows();
+            const newRowId = newRows[newRows.length - 1].id;
+
+            const id = `${section}-${newRowId}-${months[colIndex].id}`;
+            const el = document.getElementById(id) as HTMLInputElement | null;
+            el?.focus();
+          });
+
+          return;
+        }
+        if (rowIndex < rows.length - 1) {
+          this.focusCell(section, rows[rowIndex + 1].id, months[colIndex].id);
+          return;
+        }
+        break;
+
+      case KeyBoardType.Tab:
+        if (colIndex < months.length - 1) {
+          this.focusCell(section, rows[rowIndex].id, months[colIndex + 1].id);
+        }
+        return;
+        break;
+
+      case KeyBoardType.ArrowLeft:
+        if (colIndex > 0) {
+          event.preventDefault();
+          this.focusCell(section, rows[rowIndex].id, months[colIndex - 1].id);
+        }
+        return;
+        break;
+
+      case KeyBoardType.ArrowRight:
+        if (colIndex < months.length - 1) {
+          event.preventDefault();
+          this.focusCell(section, rows[rowIndex].id, months[colIndex + 1].id);
+        }
+        return;
+        break;
+
+      case KeyBoardType.ArrowUp:
+        if (rowIndex > 0) {
+          event.preventDefault();
+          this.focusCell(section, rows[rowIndex - 1].id, months[colIndex].id);
+        }
+        return;
+
+      case KeyBoardType.ArrowDown:
+        if (rowIndex < rows.length - 1) {
+          event.preventDefault();
+          this.focusCell(section, rows[rowIndex + 1].id, months[colIndex].id);
+        }
+        return;
+        break;
+    }
+  }
+
+  focusCell(section: BudgetType, rowId: string, monthId: string) {
+    const id = `${section}-${rowId}-${monthId}`;
+    const el = document.getElementById(id) as HTMLInputElement | null;
+    el?.focus();
   }
 }
