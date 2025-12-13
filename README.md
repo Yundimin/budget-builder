@@ -8,23 +8,13 @@ To start a local development server, run:
 
 ```bash
 ng serve
+
+or
+
+npm run start
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
-
-```bash
-ng generate component component-name
-```
-
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
 
 ## Building
 
@@ -34,26 +24,65 @@ To build the project run:
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+This will compile your project and store the build artifacts in the `dist/` directory.
 
-## Running unit tests
+By default, the production build optimizes your application for performance and speed.
 
-To execute unit tests with the [Karma](https://karma-runner.github.io) test runner, use the following command:
+## Data Model
 
-```bash
-ng test
+### Months
+
+Each month is represented as a plain object with a stable string-based id.
+
+```ts
+interface Month {
+  id: string; //  "2026-01"
+  label: string; //  "Jan 2026"
+  year: number;
+  month: number;
+}
 ```
 
-## Running end-to-end tests
+### DateRange
 
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
+```ts
+export interface DateRange {
+  startYear: number;
+  startMonth: number;
+  endYear: number;
+  endMonth: number;
+}
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### RowItem
 
-## Additional Resources
+Each Row is represented as a plain object with a stable string-based id.
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+```ts
+export interface RowItem {
+  id: string;
+  label: string;
+  values: Record<string, number>;
+}
+```
+
+# Signals and computed Signals
+
+Signals and computed Signals are located in 'app/components/budget/budget.ts'
+
+### Signals
+
+dateRange // startYear, startMonth, endYear, endMonth
+incomeRows // list of income line items
+expenseRows // list of expense line items
+contextMenu // state for right-click context menu
+
+### Computed
+
+startMonth // full list of selectable start months
+endMonth // end-month options filtered by selected start month
+tableMonths // months currently rendered in the table
+totalIncomeByMonth // Sum of all Income line item values for that month.
+totalExpenseByMonth // Sum of all Expenses line item values for that month.
+profitLossByMonth // Income Total – Total Expenses by month
+balancesByMonth // Closing Balance = Opening Balance + Profit/Loss ▪ The next month’s Opening Balance is the previous month’s Closing Balance
