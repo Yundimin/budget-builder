@@ -20,8 +20,14 @@
           <div class="w-fit h-fit flex gap-[8px] justify-center items-center">
             <div class="text-[16px] font-medium text-[#242424]">End Period</div>
             <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeEnd($event)">
-              @for (month of endMonth(); track $index) {
-              <option [value]="month.id" [selected]="month.id === endMonth()[endMonth().length - 1].id">
+              @for (month of endMonth(); track month.id) {
+              <option
+                [value]="month.id"
+                [selected]="
+                  month.id ===
+                  dateRange().endYear + '-' + ('' + dateRange().endMonth).padStart(2, '0')
+                "
+              >
                 {{ month.label }}
               </option>
               }

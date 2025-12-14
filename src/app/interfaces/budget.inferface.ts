@@ -6,6 +6,8 @@ export interface Month {
 }
 
 export interface DateRange {
+  initialStartYear: number;
+  initialEndYear: number;
   startYear: number;
   startMonth: number;
   endYear: number;

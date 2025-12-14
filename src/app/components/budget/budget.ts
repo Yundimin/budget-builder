@@ -12,6 +12,8 @@ import { BudgetType, KeyBoardType } from '../../enums/budget.enum';
 export class Budget implements AfterViewInit {
   public defaultNumber: number = 0;
   public dateRange = signal<DateRange>({
+    initialStartYear: 2026,
+    initialEndYear: 2026,
     startYear: 2026,
     startMonth: 1,
     endYear: 2026,
@@ -19,9 +21,9 @@ export class Budget implements AfterViewInit {
   });
   public startMonth = computed<Month[]>(() => {
     const list: Month[] = [];
-    const { startYear, endYear } = this.dateRange();
+    const { initialStartYear, initialEndYear } = this.dateRange();
 
-    for (let year = startYear; year <= endYear; year++) {
+    for (let year = initialStartYear; year <= initialEndYear; year++) {
       for (let month = 1; month <= 12; month++) {
         const monthPad = month.toString().padStart(2, '0');
         list.push({
@@ -163,12 +165,21 @@ export class Budget implements AfterViewInit {
 
   changeStart(event: Event) {
     const target = event.target as HTMLInputElement;
+    const [newStartYear, newStartMonth] = target.value.split('-').map(Number);
 
-    this.dateRange.update((range) => ({
-      ...range,
-      startYear: +target.value.split('-')[0],
-      startMonth: +target.value.split('-')[1],
-    }));
+    this.dateRange.update((range) => {
+      const startAfterEnd =
+        newStartYear > range.endYear ||
+        (newStartYear === range.endYear && newStartMonth > range.endMonth);
+
+      return {
+        ...range,
+        startYear: newStartYear,
+        startMonth: newStartMonth,
+        endYear: startAfterEnd ? newStartYear : range.endYear,
+        endMonth: startAfterEnd ? newStartMonth : range.endMonth,
+      };
+    });
   }
 
   changeEnd(event: Event) {
