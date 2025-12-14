@@ -14,7 +14,7 @@ export class Budget implements AfterViewInit {
   public dateRange = signal<DateRange>({
     startYear: 2026,
     startMonth: 1,
-    endYear: 2028,
+    endYear: 2026,
     endMonth: 12,
   });
   public startMonth = computed<Month[]>(() => {
