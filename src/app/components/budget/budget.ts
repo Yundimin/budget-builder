@@ -14,22 +14,25 @@ export class Budget implements AfterViewInit {
   public dateRange = signal<DateRange>({
     startYear: 2026,
     startMonth: 1,
-    endYear: 2026,
+    endYear: 2028,
     endMonth: 12,
   });
   public startMonth = computed<Month[]>(() => {
     const list: Month[] = [];
-    const year = 2026;
+    const { startYear, endYear } = this.dateRange();
 
-    for (let month = 1; month <= 12; month++) {
-      const monthPad = month.toString().padStart(2, '0');
-      list.push({
-        id: `${year}-${monthPad}`,
-        label: `${this.changeMonthToWord(month)} ${year}`,
-        year: year,
-        month: month,
-      });
+    for (let year = startYear; year <= endYear; year++) {
+      for (let month = 1; month <= 12; month++) {
+        const monthPad = month.toString().padStart(2, '0');
+        list.push({
+          id: `${year}-${monthPad}`,
+          label: `${this.changeMonthToWord(month)} ${year}`,
+          year,
+          month,
+        });
+      }
     }
+
     return list;
   });
   public endMonth = computed(() => {

@@ -21,7 +21,7 @@
             <div class="text-[16px] font-medium text-[#242424]">End Period</div>
             <select class="border px-[8px] py-[4px] rounded-[6px]" (change)="changeEnd($event)">
               @for (month of endMonth(); track $index) {
-              <option [value]="month.id" [selected]="month.id === '2026-12'">
+              <option [value]="month.id" [selected]="month.id === endMonth()[endMonth().length - 1].id">
                 {{ month.label }}
               </option>
               }
