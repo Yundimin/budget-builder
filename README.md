@@ -47,6 +47,8 @@ export interface Month {
 
 ```ts
 export interface DateRange {
+  initialStartYear: number;
+  initialEndYear: number;
   startYear: number;
   startMonth: number;
   endYear: number;
